@@ -1,17 +1,39 @@
 import React from 'react'
-import { assets } from '../assets/assets'
+import { categories } from '../assets/assets'
+import { useAppContext } from './../context/AppContext';
 
 const Categories = () => {
+
+    const {navigate} = useAppContext()
   return (
-  <>
-  <p>Categories</p>
-  <div>
-    <div>
-        <img src={assets.box_icon} alt="" />
-        <p>fruit</p>
-    </div>
+  <div className='mt-16'>
+  <p
+  className='text-2xl md:text-3xl font-medium '
+  >Categories</p>
+  <div 
+  className='grid grid-col-2 sm:grid-col-3 md:grid-cols-5 ld:grid-cols-6 xl:grid-col-7 mt-6 gap-6 '
+  >
+    { categories.map((category,index)=>(
+        <div 
+        key={index}
+        className='group cursor-pointer py-5 gap-2 rounded-lg flex flex-col justify items-center'
+        style={{backgroundColor:category.bgColor}}
+        onClick={()=>{
+            navigate(`/products/${category.path.toLowerCase()}`);
+            scrollTo(0,0)
+        }}        
+        >
+            <img src={category.image} alt={category.text} 
+            className='group-hover:scale-108 transition max-w-28'
+            />
+            <p
+            className='group-hover:scale-108 transition max-w-28'
+            >{category.text}</p>
+        </div>
+    )) 
+    }
   </div>
-  </>
+  </div>
   )
 }
 
