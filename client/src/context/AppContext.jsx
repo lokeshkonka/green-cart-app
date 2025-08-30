@@ -17,7 +17,7 @@ export const AppContextProvider = ({children})=>{
     const [showUserLogin,setShowUserLogin]= useState(false)
    const [products,setProducts] = useState([]);
    const [cartItems,setCartItems] = useState({});
-
+   const [searchQuery,SetsearchQuery] = useState({});
 
 
 
@@ -73,7 +73,7 @@ export const AppContextProvider = ({children})=>{
    useEffect( () => {
     fetchProducts()
    },[])
-    const value={cartItems,removeFromCart,updateCartItem,addToCart,navigate,user,setSeller,setUser,isSeller,showUserLogin,setShowUserLogin,products,currency}
+    const value={searchQuery,SetsearchQuery,cartItems,removeFromCart,updateCartItem,addToCart,navigate,user,setSeller,setUser,isSeller,showUserLogin,setShowUserLogin,products,currency}
    
    
    
