@@ -3,10 +3,10 @@ import { assets } from '../assets/assets';
 import { useAppContext } from '../context/AppContext';
 
 const ProductCard = ({ product }) => {
-  const { currency, removeFromCart, addToCart, cartItems } = useAppContext();
+  const { currency, removeFromCart, addToCart, cartItems , navigate } = useAppContext();
 
   return product && (
-    <div className="border border-gray-500/20 rounded-md md:px-4 px-3 py-2 bg-white ">
+    <div onClick={()=> {navigate(`/products/${product.category.toLowerCase()}/${product._id} ; `); scrollTo(0,0)}} className="border border-gray-500/20 rounded-md md:px-4 px-3 py-2 bg-white ">
       {/* Product Image */}
       <div className="group cursor-pointer flex items-center justify-center px-2">
         <img

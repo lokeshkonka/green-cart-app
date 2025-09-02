@@ -12,7 +12,7 @@ function Navbar() {
         if (searchQuery.length > 0) {
             navigate("/products")
         }
-    },[searchQuery])
+    },[navigate, searchQuery])
     const Logout = async () => {
         setUser(null);
         navigate('/');
