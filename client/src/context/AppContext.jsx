@@ -70,10 +70,31 @@ export const AppContextProvider = ({children})=>{
     setCartItems(cartData)
     toast.success("DELEETED FROM CART 😭")
    }
+
+   /// Get the Cart Item Count
+   const getCartCount = ()=>{
+    let totalCount = 0;
+    for(const item in cartItems){
+        totalCount += cartItems[item];
+
+    }
+    return totalCount
+   }
+ /// get the cart total amount
+ const getcartAmount = ()=>{
+    let totalam =0;
+    for(const item in cartItems){
+        let iteminfo = products.find((product)=> product._id === item);
+        if(cartItems[item] >0){
+            totalam += iteminfo.offerPrice * cartItems[item]
+        }
+    }
+    return Math.floor(totalam * 100) / 100;
+ }
    useEffect( () => {
     fetchProducts()
    },[])
-    const value={searchQuery,SetsearchQuery,cartItems,removeFromCart,updateCartItem,addToCart,navigate,user,setSeller,setUser,isSeller,showUserLogin,setShowUserLogin,products,currency}
+    const value={getCartCount,getcartAmount,searchQuery,SetsearchQuery,cartItems,removeFromCart,updateCartItem,addToCart,navigate,user,setSeller,setUser,isSeller,showUserLogin,setShowUserLogin,products,currency}
    
    
    
