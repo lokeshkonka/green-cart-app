@@ -3,9 +3,9 @@ import React, { useEffect, useState } from 'react'
 import { useAppContext } from '../../context/AppContext'
 
 const SellerLogin = () => {
-    const {isSeller,setisSeller,navigate} = useAppContext();
+    const {isSeller,setSeller,navigate} = useAppContext();
     const [email,SetEmail] = useState("");
-    const [Password,SetPassowrd] = useState("");
+    const [Password,SetPassowrd] = useState(" ");
     const OnSubmitHandler = async () => {
         
     }
