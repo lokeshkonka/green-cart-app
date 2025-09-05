@@ -31,6 +31,7 @@ export const register = async (req,res) => {
 }
 // LoginUser : /api/user/login
 export const LoginUser = async (req,res) => {
+
     try {
             const {email,password} =req.body;
     if (!email || ! password) {
@@ -56,3 +57,37 @@ return res.json({success : true ,user:{email:user.email,name:user.name,}})
     }
     }
 
+// Check Auth : api/user/is-auth
+export const IsAuth = async (req, res) => {
+  try {
+    // user info comes from authUser middleware
+    const { id } = req.user;
+
+    const user = await User.findById(id).select("-password");
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    return res.json({ success: true, user });
+  } catch (error) {
+    console.error("Error in IsAuth:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+//logout :api/user/logout
+export const Logout = async (req,res) => {
+    try {
+        res.clearCookie('token',{
+            
+            httpOnly:true,
+            secure:process.env.NODE_ENV === 'production',
+            sameSite:process.env.NODE_ENV === "production" ? 'none' : 'strict',
+        
+        })
+        return res.json({Success:true,message:"Logged OUTT"})
+    } catch (error) {
+         console.log("Error in teh Is IN LOGGOUT")
+         res.json({success : false ,message:error.message})
+    }
+}

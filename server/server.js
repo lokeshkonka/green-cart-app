@@ -4,6 +4,7 @@ import cors from 'cors';
 import connectDB from './configs/db.js';
 import'dotenv/config';
 import userRouter from './Routes/userRoute.js';
+import sellerRouter from './Routes/sellerRoute.js';
 const app = express();
 const port = process.env.PORT || 3000 ;
 //can allow multiple originss
@@ -17,4 +18,5 @@ await connectDB()
 
 app.get('/',(req,res)=>res.send("API IS WORKING"));
 app.use('/api/user',userRouter)
+app.use('/api/seller',sellerRouter);
 app.listen(port,()=>console.log(` SERVER IS RUNNING ${port}`));
