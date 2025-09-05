@@ -1,8 +1,10 @@
 import cookieParser from 'cookie-parser';
 import express from 'express';
 import cors from 'cors';
+import connectDB from './configs/db.js';
+import'dotenv/config';
 const app = express();
-const port = process.env.PORT || 4000 ;
+const port = process.env.PORT || 3000 ;
 //can allow multiple originss
 const allowedOrigins = [`http://localhost5173`];
 //Middleware Config
@@ -10,7 +12,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(cors({origin:allowedOrigins , }));
 
-
+await connectDB()
 
 app.get('/',(req,res)=>res.send("API IS WORKING"));
 
