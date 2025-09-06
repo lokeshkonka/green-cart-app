@@ -1,7 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { dummyProducts } from "../assets/assets";
+
 import toast from "react-hot-toast";
 
 //after Backend
@@ -38,9 +38,19 @@ export const AppContextProvider = ({ children }) => {
       console.log(e)
     }
   }
-  const fetchProducts = async () => {
-    setProducts(dummyProducts);
-  };
+ const fetchProducts = async () => {
+  try {
+    const { data } = await axios.get('/api/product/list');
+    if (data.success) {
+      setProducts(data.products); // ✅ matches backend key
+    } else {
+      toast.error(data.message);
+    }
+  } catch (error) {
+    toast.error(error.message);
+  }
+};
+
 
   // Add to cart
   const addToCart = (itemId) => {
@@ -125,6 +135,7 @@ export const AppContextProvider = ({ children }) => {
     setShowUserLogin,
     products,
     currency,
+    fetchProducts
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
