@@ -38,6 +38,21 @@ export const AppContextProvider = ({ children }) => {
       console.log(e)
     }
   }
+//fetchUser Status,UserData and Cart Items
+const fetchUser = async () => {
+  try {
+    const {data} = await axios.get('/api/user/is-auth');
+    if (data.success) {
+      setUser(data.user)
+      setCartItems(data.user.cartItems);
+    }
+  } catch (error) {
+    setUser(null)
+    console.log(error);
+    
+  }
+}
+
  const fetchProducts = async () => {
   try {
     const { data } = await axios.get('/api/product/list');
@@ -107,15 +122,28 @@ export const AppContextProvider = ({ children }) => {
   };
 
   // Persist isSeller in localStorage
-  useEffect(() => {
-   fetchSeller();
-   fetchProducts()
-  }, []);
 
   useEffect(() => {
+    fetchSeller();
     fetchProducts();
+    fetchUser();
   }, []);
 
+useEffect(()=>{
+ const updateCart = async () => {
+  try {
+     const {data} = await axios.post('/api/cart/update',{userId:user._id,cartItems})
+     if (!data.success) {
+      toast.error(data.message)
+     }
+  } catch (error) {
+     toast.error(error.message)
+  }
+ }
+ if (user) {
+  updateCart()
+ }
+},[cartItems, user])
   const value = {
     axios,
     getCartCount,
@@ -135,7 +163,9 @@ export const AppContextProvider = ({ children }) => {
     setShowUserLogin,
     products,
     currency,
-    fetchProducts
+    fetchProducts,
+    fetchUser,
+    setCartItems
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

@@ -1,17 +1,40 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react'
 import { useAppContext } from '../context/AppContext'
-import { assets, dummyAddress } from '../assets/assets';
+import { assets } from '../assets/assets';
+import toast from 'react-hot-toast';
 
 const Cart = () => {
     const [showAddress, setShowAddress] = useState(false)
-    const { products, currency, cartItems, removeFromCart, getCartCount, updateCartItem, navigate, getcartAmount } = useAppContext();
+    const { setCartItems,user,axios,products, currency, cartItems, removeFromCart, getCartCount, updateCartItem, navigate, getcartAmount } = useAppContext();
 
     const [cartArray, setCartArray] = useState([])
-    const [Addresses, setAddresses] = useState(dummyAddress);
-    const [selectedAddress, setSelectedAddress] = useState(dummyAddress[0]);
+    const [Addresses, setAddresses] = useState([]);
+    const [selectedAddress, setSelectedAddress] = useState(null);
     const [paymentOption, setPaymentOption] = useState("COD");
 
-    const placeOrder = async () => {}
+    const placeOrder = async () => {
+        try {
+            if(!selectedAddress){
+                return toast.error("Select an Address")
+            }
+            ///
+            if(paymentOption  === "COD"){
+                const {data} = await axios.post('/api/order/cod',{
+                    userId:user._id,items:cartArray.map(item=>({product:item._id,quantity:item.quantity})),address:selectedAddress._id
+                })
+                if (data.success) {
+                    toast.success(data.message)
+                    setCartItems({})
+                    navigate('/my-orders')
+                }else{
+                     toast.error(data.message)
+                }
+            }
+        } catch (error) {
+            toast.error(error.message)
+        }
+    }
 
     const getCart = () => {
         let tempArray = [];
@@ -25,11 +48,38 @@ const Cart = () => {
         setCartArray(tempArray);
     }
 
+const getUserAddress = async () => {
+    try {
+        const { data } = await axios.get('/api/address/get', {
+            params: { userId: user._id } // send userId as query param
+        });
+
+        if (data.success) {
+            setAddresses(data.addresses); // lowercase consistent
+            if (data.addresses.length > 0) {
+                setSelectedAddress(data.addresses[0]); // use setter
+            }
+        } else {
+            toast.error(data.message);
+        }
+    } catch (error) {
+        toast.error(error.message);
+        console.log("Error fetching addresses:", error);
+    }
+};
+
     useEffect(() => {
         if (products.length > 0 && cartItems) {
             getCart()
         }
     }, [products, cartItems])
+    useEffect(() => {
+        if (user) {
+            getUserAddress()
+        }
+    }, [user])
+
+
 
     return products.length > 0 && cartItems ? (
         <div className="flex flex-col md:flex-row mt-16">
@@ -48,7 +98,7 @@ const Cart = () => {
                     <div key={index} className="grid grid-cols-[2fr_1fr_1fr] text-gray-500 items-center text-sm md:text-base font-medium pt-3">
                         <div className="flex items-center md:gap-6 gap-3">
                             <div onClick={() => { navigate(`/products/${product.category.toLowerCase()}/${product._id}`); scrollTo(0, 0) }} className="cursor-pointer w-24 h-24 flex items-center justify-center border border-gray-300 rounded overflow-hidden">
-                                <img className="max-w-full h-full object-cover" src={product.image[0]} alt={product.name} />
+                                <img className="max-w-full h-full object-cover" src={product.imagesURL[0]} alt={product.name} />
                             </div>
                             <div>
                                 <p className="hidden md:block font-semibold">{product.name}</p>
@@ -104,22 +154,32 @@ const Cart = () => {
                         <button onClick={() => setShowAddress(!showAddress)} className="text-primary hover:underline cursor-pointer">
                             Change
                         </button>
-                        {showAddress && (
-                            <div className="absolute top-12 py-1 bg-white border border-gray-300 text-sm w-full">
-                                {Addresses.map((address, index) => (
-                                    <p
-                                        key={index}
-                                        onClick={() => setSelectedAddress(address)}
-                                        className="text-gray-500 p-2 hover:bg-gray-100"
-                                    >
-                                        {address.street},{address.city},{address.state},{address.country}
-                                    </p>
-                                ))}
-                                <p onClick={() => navigate("/add-address")} className="text-primary text-center cursor-pointer p-2 hover:bg-primary-dull/10">
-                                    Add address
-                                </p>
-                            </div>
-                        )}
+{showAddress && (
+  <div className="absolute top-8 w-full bg-white border border-gray-300 rounded shadow-md z-10">
+    {Addresses.map((address, i) => (
+      <p
+        key={i}
+        onClick={() => {
+          setSelectedAddress(address);  // set new address
+          setShowAddress(false);        // hide the dropdown
+        }}
+        className="p-2 text-gray-700 hover:bg-gray-100 cursor-pointer"
+      >
+        {address.street}, {address.city}, {address.state}, {address.country}
+      </p>
+    ))}
+    <p
+      onClick={() => {
+        navigate("/add-address");
+        setShowAddress(false); // hide dropdown when navigating
+      }}
+      className="p-2 text-primary text-center hover:bg-primary/10 cursor-pointer"
+    >
+      Add Address
+    </p>
+  </div>
+)}
+
                     </div>
 
                     <p className="text-sm font-medium uppercase mt-6">Payment Method</p>

@@ -1,18 +1,29 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from "react";
 import { useAppContext } from "../context/AppContext";
-import { dummyOrders } from "../assets/assets";
 
 const MyOrders = () => {
   const [myOrders, setMyOrders] = useState([]);
-  const { currency } = useAppContext();
+  const { user, currency, axios } = useAppContext();
 
   const fetchMyOrders = async () => {
-    setMyOrders(dummyOrders);
+    try {
+      const { data } = await axios.get("/api/order/user", {
+        params: { userId: user._id },
+      });
+      if (data.success) {
+        setMyOrders(data.orders || []);
+      }
+    } catch (error) {
+      console.log("Error fetching orders:", error);
+    }
   };
 
   useEffect(() => {
-    fetchMyOrders();
-  }, []);
+    if (user) {
+      fetchMyOrders();
+    }
+  }, [user]);
 
   return (
     <div className="mt-16 pb-16 px-4 md:px-12">
@@ -30,7 +41,7 @@ const MyOrders = () => {
         <div className="space-y-8">
           {myOrders.map((order, index) => (
             <div
-              key={index}
+              key={order._id || index}
               className="border border-gray-200 rounded-2xl p-6 bg-white shadow-sm 
               transform transition duration-300 hover:scale-[1.02] hover:shadow-lg 
               animate-[pop_0.4s_ease-out]"
@@ -56,54 +67,60 @@ const MyOrders = () => {
 
               {/* Items */}
               <div className="space-y-6">
-                {order.items.map((item, idx) => (
-                  <div
-                    key={idx}
-                    className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b last:border-b-0 pb-4"
-                  >
-                    {/* Product Info */}
-                    <div className="flex items-center gap-4">
-                      <div className="bg-primary/10 p-3 rounded-xl">
-                        <img
-                          src={item.product.image[0]}
-                          alt={item.product.name}
-                          className="w-16 h-16 object-cover rounded-md"
-                        />
+                {order.items && order.items.length > 0 ? (
+                  order.items.map((item, idx) => (
+                    <div
+                      key={idx}
+                      className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b last:border-b-0 pb-4"
+                    >
+                      {/* Product Info */}
+                      <div className="flex items-center gap-4">
+                        <div className="bg-primary/10 p-3 rounded-xl">
+                          <img
+                            src={item?.product?.imagesURL?.[0] || "/placeholder.png"}
+                            alt={item?.product?.name || "Unknown Product"}
+                            className="w-16 h-16 object-cover rounded-md"
+                          />
+                        </div>
+                        <div>
+                          <h2 className="text-lg font-medium text-gray-800">
+                            {item?.product?.name || "Unknown Product"}
+                          </h2>
+                          <p className="text-sm text-gray-500">
+                            Category: {item?.product?.category || "N/A"}
+                          </p>
+                        </div>
                       </div>
-                      <div>
-                        <h2 className="text-lg font-medium text-gray-800">
-                          {item.product.name}
-                        </h2>
-                        <p className="text-sm text-gray-500">
-                          Category: {item.product.category}
+
+                      {/* Status & Amount */}
+                      <div className="flex flex-col md:items-end gap-1">
+                        <p className="text-gray-600 text-sm">
+                          Quantity: {item?.quantity || 1}
+                        </p>
+                        <p className="text-gray-600 text-sm">
+                          Status:{" "}
+                          <span className="text-primary font-medium">
+                            {order.status}
+                          </span>
+                        </p>
+                        <p className="text-gray-600 text-sm">
+                          Date:{" "}
+                          {order.createdAt
+                            ? new Date(order.createdAt).toLocaleDateString()
+                            : "N/A"}
+                        </p>
+                        <p className="text-primary text-base font-semibold mt-1">
+                          {currency}
+                          {item?.product?.offerPrice
+                            ? item.product.offerPrice * (item.quantity || 1)
+                            : 0}
                         </p>
                       </div>
                     </div>
-
-                    {/* Status & Amount */}
-                    <div className="flex flex-col md:items-end gap-1">
-                      <p className="text-gray-600 text-sm">
-                        Quantity: {item.quantity || 1}
-                      </p>
-                      <p className="text-gray-600 text-sm">
-                        Status:{" "}
-                        <span className="text-primary font-medium">
-                          {order.status}
-                        </span>
-                      </p>
-                      <p className="text-gray-600 text-sm">
-                        Date:{" "}
-                        {order.createdAt
-                          ? new Date(order.createdAt).toLocaleDateString()
-                          : "N/A"}
-                      </p>
-                      <p className="text-primary text-base font-semibold mt-1">
-                        {currency}
-                        {item.product.offerPrice * (item.quantity || 1)}
-                      </p>
-                    </div>
-                  </div>
-                ))}
+                  ))
+                ) : (
+                  <p className="text-gray-500 text-sm">No items in this order.</p>
+                )}
               </div>
             </div>
           ))}

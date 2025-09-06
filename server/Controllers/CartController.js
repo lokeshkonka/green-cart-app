@@ -1,16 +1,31 @@
-import User from "../Models/User.js"
+import User from "../Models/User.js";
 
-//update user cart : api/cart/update
-export const updateCart =async (req,res) => {
-    try {
-        const {userId,cartItems } = req.body
-        await User.findByIdAndUpdate(userId,{cartItems})
+// Update user cart: POST /api/cart/update
+export const updateCart = async (req, res) => {
+  try {
+    const { userId, cartItems } = req.body;
 
-        res.json({success:true,message:"CArt UPdated"})
-    } catch (error) {
-        console.log("Cart Controller Update error");
-        res.json({success:false,message:error.message})
-        
-        
+    if (!userId) {
+      return res.status(400).json({ success: false, message: "User ID is required" });
     }
-}
+
+    // Make sure cartItems is an object
+    if (!cartItems || typeof cartItems !== "object") {
+      return res.status(400).json({ success: false, message: "cartItems must be an object" });
+    }
+
+    // Find user and update cartItems
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    user.cartItems = cartItems;
+    await user.save(); // Save changes
+
+    return res.json({ success: true, message: "Cart updated successfully", cartItems: user.cartItems });
+  } catch (error) {
+    console.error("Cart Controller Update error:", error);
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
