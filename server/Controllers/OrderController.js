@@ -1,6 +1,6 @@
 
-import Product from './../Models/Product';
-import Order from './../Models/Order';
+import Product from './../Models/Product.js';
+import Order from './../Models/Order.js';
 // COD : api/order/cod
 
 export const placeOrderCOD = async (req,res) => {
