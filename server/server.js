@@ -7,6 +7,7 @@ import userRouter from './Routes/userRoute.js';
 import sellerRouter from './Routes/sellerRoute.js';
 import connectCloudinary from './configs/cloudinary.js';
 import ProductRouter from './Routes/ProductRoute.js';
+import cartRouter from './Routes/CartRoute.js';
 
 
 const app = express();
@@ -34,5 +35,6 @@ app.get('/',(req,res)=>res.send("API IS WORKING"));
 app.use('/api/user',userRouter)
 app.use('/api/seller',sellerRouter);
 app.use('/api/product',ProductRouter);
+app.use('/api/cart',cartRouter);
 
 app.listen(port,()=>console.log(` SERVER IS RUNNING ${port}`));
