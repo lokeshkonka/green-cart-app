@@ -14,14 +14,14 @@ export const addProduct = async (req,res) => {
                 return result.secure_url
             })
         )
-        await Product .create({...productData,imagesURL});
-        return res.json({sucess:true,message:"Product Added"})
+        await Product.create({...productData,imagesURL});
+        return res.json({success:true,message:"Product Added"})
 
 
 
     } catch (error) {
         console.log("Product Not Added",error.message);
-        res.json({sucess:false,message:error.message})
+        res.json({success:false,message:error.message})
 
     }
 }

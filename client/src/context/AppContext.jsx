@@ -4,6 +4,12 @@ import { useNavigate } from "react-router-dom";
 import { dummyProducts } from "../assets/assets";
 import toast from "react-hot-toast";
 
+//after Backend
+
+import axios from 'axios';
+axios.defaults.withCredentials = true;
+axios.defaults.baseURL = import.meta.env.VITE_BACKEND_URL;
+
 export const AppContext = createContext();
 
 export const AppContextProvider = ({ children }) => {
@@ -11,15 +17,27 @@ export const AppContextProvider = ({ children }) => {
   const navigate = useNavigate();
 
   const [user, setUser] = useState(null);
-  const [isSeller, setSeller] = useState(() => {
-    // Load from localStorage on first render
-    return localStorage.getItem("isSeller") === "true";
-  });
+  const [isSeller, setSeller] = useState(false);
   const [showUserLogin, setShowUserLogin] = useState(false);
   const [products, setProducts] = useState([]);
   const [cartItems, setCartItems] = useState({});
   const [searchQuery, SetsearchQuery] = useState("");
 
+
+  //fetch Seller 
+  const fetchSeller = async () => {
+    try {
+      const {data} = await axios.get('/api/seller/is-auth');
+      if (data.success) {
+        setSeller(true)
+      }else{
+         setSeller(false)
+      }
+    } catch (e) {
+      setSeller(false);
+      console.log(e)
+    }
+  }
   const fetchProducts = async () => {
     setProducts(dummyProducts);
   };
@@ -80,14 +98,16 @@ export const AppContextProvider = ({ children }) => {
 
   // Persist isSeller in localStorage
   useEffect(() => {
-    localStorage.setItem("isSeller", isSeller);
-  }, [isSeller]);
+   fetchSeller();
+   fetchProducts()
+  }, []);
 
   useEffect(() => {
     fetchProducts();
   }, []);
 
   const value = {
+    axios,
     getCartCount,
     getcartAmount,
     searchQuery,

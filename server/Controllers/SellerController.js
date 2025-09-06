@@ -7,9 +7,9 @@ export const SellerLogin = async (req,res) => {
         if (email === process.env.SELLER_EMAIL && password === process.env.SELLER_PASSWORD) {
             const token = jwt.sign({email:email},process.env.JWT_SECRET,{expiresIn:'7d'});
             res.cookie('SellerToken',token,{httpOnly:true,secure:process.env.NODE_ENV === 'production',sameSite:process.env.NODE_ENV === 'production' ? 'none' : 'strict',maxAge:7 * 24 * 60 * 1000});
-            return res.json({sucess:true,message:"LOGGED IN SELLER"})
+            return res.json({success:true,message:"LOGGED IN SELLER"})
         }else{
-                   return res.json({sucess:false,message:"Invalid SELLER"})
+                   return res.json({success:false,message:"Invalid SELLER"})
      
         }
         
@@ -40,7 +40,7 @@ export const SellerLogout = async (req,res) => {
             sameSite:process.env.NODE_ENV === "production" ? 'none' : 'strict',
         
         })
-        return res.json({Success:true,message:"Seller Logged OUTT"})
+        return res.json({success:true,message:"Seller Logged OUTT"})
     } catch (error) {
          console.log("Error in the Is IN LOGGOUT Seller")
          res.json({success : false ,message:error.message})
